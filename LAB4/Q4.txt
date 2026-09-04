@@ -1,0 +1,53 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Write an ARM assembly language program to covert 2-digit hexadecimal
+    number in ASCII unpacked form into its equivalent packed hexadecimal number.
+
+    Unpacked ASCII -> Packed Hexadecimal
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R0, =ASCII
+    LDRB R1, [R0]           ; First ASCII digit
+    LDRB R2, [R0, #1]       ; Second ASCII digit
+
+    ; First digit convert to Hex
+    SUB R1, R1, #0x30
+    MOV R1, R1, LSL #4     
+
+    ; Second digit convert to Hex 
+    SUB R2, R2, #0x30
+    ADD R1, R1, R2          ; Pack two digit
+
+    LDR R0, =RESULT
+    STR R1, [R0]
+
+STOP
+    B STOP
+
+ASCII DCD 0x32, 0x35
+    AREA data, DATA, READWRITE
+
+RESULT DCD 0
+    END

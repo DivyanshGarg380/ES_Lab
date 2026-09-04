@@ -1,0 +1,49 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Write a program to convert a 32 bit number in the unpacked form into packed form.
+
+    32-bit Unpacked -> Packed
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R0, =UNPACKED
+    LDR R1, [R0]
+
+    AND R2, R1, #0x0F
+    MOV R3, R1, LSR #4
+    AND R3, R3, #0x0F
+
+    ORR R2, R2, R3, LSL #4
+
+    LDR R0, =RESULT
+    STR R2, [R0]
+
+STOP
+    B STOP
+
+UNPACKED DCD 0x00000205
+    AREA data, DATA, READWRITE
+
+RESULT DCD 0
+    END

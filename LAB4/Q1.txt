@@ -1,0 +1,58 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Write an assembly program to convert a 2 digit hexadecimal number into
+    unpacked ASCII.
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R0, =NUM
+    LDR R1, [R0]
+
+    AND R2, R1, #0x0F
+    
+    CMP R2, #9
+    BLO DIGIT1
+    ADD R2, R2, #7
+
+DIGIT1
+    ADD R2, R2, #0x30
+    LDR R3, =RESULT
+    STRB R2, [R3]
+
+    AND R2, R1, #0xF0
+    MOV R2, R2, LSR #4
+
+    CMP R2, #9
+    BLO DIGIT2
+    ADD R2, R2, #7
+
+DIGIT2
+    ADD R2, R2, #0x30
+    STRB R2, [R3, #1]
+
+NUM DCD 0x3A
+    AREA data, DATA, READWRITE
+
+RESULT DCD 0
+    END
