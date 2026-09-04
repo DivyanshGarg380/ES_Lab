@@ -1,0 +1,64 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Write a program to add two 128 bit numbers stored in code segment and store
+    the result in data segment.
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R0, =NUM1           ; Address of first 128-bit number
+    LDR R1, =NUM2           ; Address of second 128-bit number
+    LDR R2, =RES            ; Address of result
+
+    ; Add 1 word at a time and update carry flag accordingly
+
+    LDR R3, [R0]
+    LDR R4, [R1]
+    ADDS R5, R3, R4
+    STR R5, [R2]
+
+    LDR R3, [R0, #4]
+    LDR R4, [R1, #4]
+    ADCS R5, R3, R4
+    STR R5, [R2, #4]
+
+    LDR R3, [R0, #8]
+    LDR R4, [R1, #8]
+    ADCS R5, R3, R4
+    STR R5, [R2, #8]
+
+    LDR R3, [R0, #12]
+    LDR R4, [R1, #12]
+    ADCS R5, R3, R4
+    STR R5, [R2, #12]
+
+STOP
+    B STOP
+
+NUM1 DCD 0x11111111, 0x22222222, 0x33333333, 0x44444444
+NUM2 DCD 0x55555555, 0x66666666, 0x77777777, 0x88888888
+
+    AREA DATASEG, DATA, READWRITE
+
+RES DCD 0, 0, 0, 0
+    END

@@ -1,0 +1,75 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Write an assembly language program to find LCM of two numbers.
+    Hint: i=1
+        do{
+            remainder= i*a mod b;
+            if(remainder==0)
+                Exit;
+            else
+                i++;
+        } while(remainder!=0);
+        return (i*a);
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R0, =VAL1           ; a 
+    LDR R1, [R0]
+
+    LDR R0, =VAL2           ; b
+    LDR R2, [R0]
+
+    MOV R3, #1              ; i = 1
+
+LOOP
+    MUL R4, R3, R1          ; i x a
+    MOV R5, R4              ; Find R4 mod b by repetitive subtraction
+
+MOD 
+    CMP R5, R2
+    BLO CHECK
+    SUB R5, R5, R2
+    B MOD
+
+CHECK 
+    CMP R5, #0
+    BEQ DONE                ; remainder = 0
+
+    ADD R3, R3, #1          ; i++;
+    B LOOP
+
+DONE    
+    MUL R6, R3, R1          ; LCM = i x a
+    LDR R0, =RESULT
+    STR R6, [R0]
+
+STOP
+    B STOP
+
+VAL1 DCD 12
+VAL2 DCD 8
+    AREA DATASEG, DATA, READWRITE
+
+RESULT DCD 0
+    END
