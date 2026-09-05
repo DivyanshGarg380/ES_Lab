@@ -1,0 +1,75 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Write an ARM program to sort a list using bubble sort.
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    MOV R4, #0
+    MOV R1, #10
+    LDR R0, =LIST
+    LDR R2, =RESULT
+
+COPY
+    LDR R3, [R0, R4]    ; Load current element
+    STR R3, [R2, R4]    ; Store into result 
+    ADD R4, R4, #4
+    SUB R1, R1, #1
+    CMP R1, #0
+    BHI COPY
+
+    ; Bubble Sort
+    
+    LDR R0, =RESULT 
+    MOV R3, #9          ; Comparisons in first pass
+    MOV R9, #9          ; Total passes
+
+OUTER_LOOP
+    MOV R5, R0          ; Start of current pass
+    MOV R4, R3          ; Comparisons in this pass
+
+INNER_LOOP
+    LDR R6, [R5], #4    ; Load current element and move ahead
+    LDR R7, [R5]        ; Load next element
+
+    CMP R7, R6          ; compare adjacent elements
+
+    ; If next < current -> swap
+    STRLS R6, [R5]
+    STRLS R7, [R5, #-4]
+
+    SUBS R4, R4, #1
+    BNE INNER_LOOP
+
+    SUB R3, R3, #1      ; One less comparison next pass
+    SUBS R9, R9, #1
+    BNE OUTER_LOOP
+
+STOP
+    B STOP
+
+LIST DCD 0x10, 0x05, 0x33, 0x24, 0x56, 0x77, 0x21, 0x04, 0x87, 0x01
+    AREA DATA1, DATA, READWRITE
+
+RESULT DCD 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    END

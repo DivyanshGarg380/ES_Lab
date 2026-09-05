@@ -1,0 +1,63 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Write an assembly program to find the factorial of a unsigned number using
+    recursion.
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R0, =NUM
+    LDR R0, [R0]
+    BL FACTORIAL
+
+    LDR R1, =RESULT
+    STR R0, [R1]
+
+STOP
+    B STOP
+
+FACTORIAL
+    CMP R0, #1
+    BLE BASE                ; if n <= 1 return 1
+
+    PUSH {R0, LR}           ; save n and return address
+
+    SUB R0, R0, #1          ; n = n - 1
+    BL FACTORIAL
+
+    MOV R1, R0              ; R1 = Factorial(n-1)
+
+    POP {R0, LR}            ; restore original n 
+
+    MUL R0, R0, R1
+    BX LR                   ; return 
+
+BASE
+    MOV R0, #1
+    BX LR
+
+NUM DCD 5
+    AREA DATA, DATA, READWRITE
+
+RESULT DCD 0
+    END
