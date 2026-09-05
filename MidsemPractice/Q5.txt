@@ -10,8 +10,7 @@ Author :
 */
 
 /*
-    Write an assembly program to search an element in an array of ten 32 bit numbers
-    using linear search.
+    Write an ARM program to calculate sum of N natural numbers RECURSIVELY
 */
 
     AREA RESET, DATA, READONLY
@@ -26,39 +25,39 @@ __Vectors
 	EXPORT Reset_Handler
 Reset_Handler
 
-    LDR R0, =ARRAY 
-    LDR R1, =KEY 
-    LDR R1, [R1] 
+    LDR R0, =NUM
+    LDR R0, [R0]
 
-    MOV R2, #10
-    MOV R3, #0
+    BL SUM
 
-LOOP
-    LDR R4, [R0]           ; load current element
-    CMP R4, R1             ; compare with key
+    LDR R1, =RESULT 
+    STR R0, [R1]
 
-    BEQ FOUND              ; if equal, found
-
-    ADD R0, R0, #4         ; move to next element
-    ADD R3, R3, #1         ; index++
-    SUB R2, R2, #1         ; count--
-
-    CMP R2, #0
-    BNE LOOP               ; continue searching
-
-    MOV R3, #-1            ; not found
+STOP    
     B STOP
 
-FOUND
-    LDR R5, =RESULT
-    STR R3, [R5]           ; store index
 
-STOP
-    B STOP 
+SUM     
+    CMP R0, #0
+    BEQ BASE 
 
-ARRAY DCD 10, 25, 40, 15, 50, 60, 70, 80, 90, 100
+    PUSH {R0, LR}           ; save N 
 
-KEY DCD 15
+    SUB R0, R0, #1
+    BL SUM                  ; Recursive call on N - 1 
+
+    MOV R1, R0              ; Contains SUM(N-1)
+
+    POP {R0, LR}            ; Restore N 
+
+    ADD R0, R0, R1          ; N + SUM(N-1)
+    BX LR
+
+BASE    
+    MOV R0, #0
+    BX LR
+
+NUM DCD 5
     AREA DATA, DATA, READWRITE
 
 RESULT DCD 0

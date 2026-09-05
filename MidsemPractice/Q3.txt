@@ -10,8 +10,7 @@ Author :
 */
 
 /*
-    Write an assembly program to search an element in an array of ten 32 bit numbers
-    using linear search.
+    Write an ARM program to count how many even numbers are present in an array of 10 numbers.
 */
 
     AREA RESET, DATA, READONLY
@@ -26,39 +25,31 @@ __Vectors
 	EXPORT Reset_Handler
 Reset_Handler
 
-    LDR R0, =ARRAY 
-    LDR R1, =KEY 
-    LDR R1, [R1] 
-
-    MOV R2, #10
-    MOV R3, #0
+    LDR R0, =ARRAY
+    MOV R1, #10
+    MOV R2, #0              ; even count tracker
 
 LOOP
-    LDR R4, [R0]           ; load current element
-    CMP R4, R1             ; compare with key
+    LDR R3, [R0]
+    AND R4, R3, #1          ; check last bit
+    CMP R4, #0
+    BNE NEXT                ; odd -> skip
 
-    BEQ FOUND              ; if equal, found
+    ADD R2, R2, #1
 
-    ADD R0, R0, #4         ; move to next element
-    ADD R3, R3, #1         ; index++
-    SUB R2, R2, #1         ; count--
+NEXT 
+    ADD R0, R0, #4
+    SUB R1, R1, #1
+    CMP R1, #0
+    BNE LOOP
 
-    CMP R2, #0
-    BNE LOOP               ; continue searching
-
-    MOV R3, #-1            ; not found
-    B STOP
-
-FOUND
     LDR R5, =RESULT
-    STR R3, [R5]           ; store index
+    STR R2, [R5]
 
 STOP
-    B STOP 
+    B STOP
 
-ARRAY DCD 10, 25, 40, 15, 50, 60, 70, 80, 90, 100
-
-KEY DCD 15
+ARRAY DCD 10, 15, 20, 23,30,41, 50, 61, 70, 80
     AREA DATA, DATA, READWRITE
 
 RESULT DCD 0

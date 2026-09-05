@@ -10,8 +10,7 @@ Author :
 */
 
 /*
-    Write an assembly program to search an element in an array of ten 32 bit numbers
-    using linear search.
+    Write an ARM program to find the larger of two unsigned 32-bit numbers using a function.
 */
 
     AREA RESET, DATA, READONLY
@@ -26,40 +25,34 @@ __Vectors
 	EXPORT Reset_Handler
 Reset_Handler
 
-    LDR R0, =ARRAY 
-    LDR R1, =KEY 
-    LDR R1, [R1] 
+    LDR R0, =NUM1
+    LDR R0, [R0]
 
-    MOV R2, #10
-    MOV R3, #0
+    LDR R1, =NUM2
+    LDR R1, [R1]
 
-LOOP
-    LDR R4, [R0]           ; load current element
-    CMP R4, R1             ; compare with key
+    BL MAX_NUM
 
-    BEQ FOUND              ; if equal, found
-
-    ADD R0, R0, #4         ; move to next element
-    ADD R3, R3, #1         ; index++
-    SUB R2, R2, #1         ; count--
-
-    CMP R2, #0
-    BNE LOOP               ; continue searching
-
-    MOV R3, #-1            ; not found
-    B STOP
-
-FOUND
-    LDR R5, =RESULT
-    STR R3, [R5]           ; store index
+    LDR R2, =RESULT
+    STR R0, [R2]
 
 STOP
-    B STOP 
+    B STOP
 
-ARRAY DCD 10, 25, 40, 15, 50, 60, 70, 80, 90, 100
+MAX_NUM
+    CMP R0, R1
+    BHS DONE               ; R0 >= R1
 
-KEY DCD 15
+    MOV R0, R1             ; if R1 is larger -> move it to R0
+
+DONE    
+    BX LR
+
+NUM1 DCD 45
+NUM2 DCD 72
     AREA DATA, DATA, READWRITE
 
 RESULT DCD 0
     END
+
+

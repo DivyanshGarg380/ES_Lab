@@ -10,8 +10,7 @@ Author :
 */
 
 /*
-    Write an assembly program to search an element in an array of ten 32 bit numbers
-    using linear search.
+    Write an ARM program to perform Linear Search Using a Function -> Return 1 if found else 0
 */
 
     AREA RESET, DATA, READONLY
@@ -26,39 +25,40 @@ __Vectors
 	EXPORT Reset_Handler
 Reset_Handler
 
-    LDR R0, =ARRAY 
-    LDR R1, =KEY 
-    LDR R1, [R1] 
+    LDR R0, =ARRAY
+    LDR R1, =KEY
+    LDR R1, [R1]
 
-    MOV R2, #10
-    MOV R3, #0
+    BL SEARCH
 
-LOOP
-    LDR R4, [R0]           ; load current element
-    CMP R4, R1             ; compare with key
-
-    BEQ FOUND              ; if equal, found
-
-    ADD R0, R0, #4         ; move to next element
-    ADD R3, R3, #1         ; index++
-    SUB R2, R2, #1         ; count--
-
-    CMP R2, #0
-    BNE LOOP               ; continue searching
-
-    MOV R3, #-1            ; not found
-    B STOP
-
-FOUND
-    LDR R5, =RESULT
-    STR R3, [R5]           ; store index
+    LDR R2, =RESULT
+    STR R0, [R2]
 
 STOP
-    B STOP 
+    B STOP
 
-ARRAY DCD 10, 25, 40, 15, 50, 60, 70, 80, 90, 100
+SEARCH 
+    MOV R2, #10
 
-KEY DCD 15
+LOOP
+    LDR R3, [R0]
+    CMP R3, R1
+    BEQ FOUND
+
+    ADD R0, R0, #4
+    SUB R2, R2, #1
+    CMP R2, #0
+    BNE LOOP
+
+    MOV R0, #0
+    BX LR 
+
+FOUND   
+    MOV R0, #1
+    BX LR
+
+ARRAY DCD 10, 20, 30, 40, 50, 60, 70, 80, 90, 100
+KEY DCD 70
     AREA DATA, DATA, READWRITE
 
 RESULT DCD 0

@@ -10,8 +10,7 @@ Author :
 */
 
 /*
-    Write an assembly program to search an element in an array of ten 32 bit numbers
-    using linear search.
+    Write an ARM program to calculate Factorial of a number RECURSIVELY. Also make sure to check the base case properly (include 0!)
 */
 
     AREA RESET, DATA, READONLY
@@ -26,39 +25,37 @@ __Vectors
 	EXPORT Reset_Handler
 Reset_Handler
 
-    LDR R0, =ARRAY 
-    LDR R1, =KEY 
-    LDR R1, [R1] 
+    LDR R0, =NUM
+    LDR R0, [R0]
 
-    MOV R2, #10
-    MOV R3, #0
-
-LOOP
-    LDR R4, [R0]           ; load current element
-    CMP R4, R1             ; compare with key
-
-    BEQ FOUND              ; if equal, found
-
-    ADD R0, R0, #4         ; move to next element
-    ADD R3, R3, #1         ; index++
-    SUB R2, R2, #1         ; count--
-
-    CMP R2, #0
-    BNE LOOP               ; continue searching
-
-    MOV R3, #-1            ; not found
-    B STOP
-
-FOUND
-    LDR R5, =RESULT
-    STR R3, [R5]           ; store index
+    BL FACT 
+    LDR R1, =RESULT 
+    STR R0, [R1]
 
 STOP
-    B STOP 
+    B STOP
 
-ARRAY DCD 10, 25, 40, 15, 50, 60, 70, 80, 90, 100
+FACT 
+    CMP R0, #1
+    BLE BASE            ; if N <= 1
 
-KEY DCD 15
+    PUSH {R0, LR}       ; save N 
+
+    SUB R0, R0, #1
+    BL FACT 
+
+    MOV R1, R0
+
+    POP {R0, LR}        ; Restore original N
+
+    MUL R0, R0, R1 
+    BX LR
+
+BASE 
+    MOV R0, #1
+    BX LR 
+
+NUM DCD 5 
     AREA DATA, DATA, READWRITE
 
 RESULT DCD 0
