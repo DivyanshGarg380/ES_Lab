@@ -1,0 +1,69 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Write an ARM assembly program to calculate:
+    - BASE^POWER
+    using a recursive function.
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R0, =BASE
+    LDR R0, [R0]
+
+    LDR R1, =POWER
+    LDR R1, [R1]
+
+    BL POWER_FUNC
+    LDR R2, =RESULT
+    STR R0, [R2]
+
+STOP 
+    B STOP
+
+POWER_FUNC
+    CMP R1, #0
+    BEQ BASE_CASE  
+
+    PUSH {R0, R1, LR}           ; save base, power and return address
+
+    SUB R1, R1, #1              ; power - 1
+    BL POWER_FUNC
+
+    MOV R2, R0                  ; R2 = result of recursive call 
+    
+    POP {R0, R1, LR}            ; restore base and power 
+
+    MUL R0, R0, R2              ; result = base * result 
+
+    BX LR 
+
+BASE_CASE
+    MOV R0, #1
+    BX LR
+
+BASE DCD 2
+POWER DCD 5
+    AREA DATA, DATA, READWRITE
+
+RESULT DCD 0
+    END

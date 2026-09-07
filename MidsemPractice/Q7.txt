@@ -1,0 +1,78 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Write an ARM assembly program to find the sum of divisors of a number. 
+    If the sum is greater than the original number, store 1 in a different register, otherwise store 0.
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R0, =NUM;           
+    LDR R0, [R0]            ; Load original number 
+
+    MOV R1, R0              ; R1 = Number to divide
+    MOV R2, #1              ; R2 = current divisor
+    MOV R3, #0              ; Stores sum
+
+LOOP 
+    CMP R2, R1
+    BHI CHECK               ; stop when divisor > number 
+
+    ; Check wether R1 is divisible by R2 
+    MOV R4, R1              ; R4 = number 
+    MOV R6, R2              ; R6 = divisor 
+
+DIVIDE 
+    CMP R4, R6 
+    BLO NOT_DIVISOR
+
+    SUB R4, R4, R6 
+    CMP R4, #0 
+    BEQ ADD_DIVISOR
+
+    B DIVIDE 
+
+ADD_DIVISOR
+    ADD R3, R3, R2          ; sum += divisor 
+
+NOT_DIVISOR                 
+    ADD R2, R2, #1          ; next divisor 
+    B LOOP 
+
+CHECK 
+    CMP R3, R0              ; compare sum with original num     
+    BHI GREATER 
+
+    MOV R5, #0
+    B STOP 
+
+GREATER
+    MOV R5, #1              ; sum > number 
+
+STOP
+    B STOP 
+
+NUM DCD 12 
+    AREA DATA, DATA, READWRITE 
+
+RESULT DCD 0
+    END

@@ -1,0 +1,76 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Write an ARM program to determine whether a number is prime.
+
+    - Count how many divisors the number has.
+    - If it has exactly 2 divisors, store 1 in R5.
+    - Otherwise store 0.
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R0, =NUM 
+    LDR R0, [R0]
+
+    MOV R1, #1              ; current divisor
+    MOV R3, #0              ; divisor count 
+
+LOOP    
+    CMP R1, R0
+    BHI CHECK 
+
+    MOV R4, R0
+    MOV R6, R1
+
+DIVIDE 
+    CMP R4, R6 
+    BLO NEXT
+
+    SUB R4, R4, R6 
+    CMP R4, #0
+    BEQ DIVISOR
+
+    B DIVIDE
+
+DIVISOR
+    ADD R3, R3, #1
+
+NEXT 
+    ADD R1, R1, #1
+    B LOOP 
+
+CHECK 
+    CMP R3, #2
+    BEQ PRIME
+
+    MOV R5, #0
+    B STOP
+
+PRIME   
+    MOV R5, #1
+
+STOP 
+    B STOP 
+
+NUM DCD 13
+    END

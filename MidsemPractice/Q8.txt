@@ -1,0 +1,80 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Write an ARM assembly program to:
+
+    - Find the sum of all proper divisors of a number.
+    - Proper divisors exclude the number itself.
+    - If the sum equals the original number, store 1 in R5.
+    - Otherwise store 0 in R5.
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R0, =NUM 
+    LDR R0, [R0]
+
+    MOV R1, R0
+    MOV R2, #1
+    MOV R3, #0
+
+LOOP 
+    CMP R2, R1
+    BHS CHECK
+
+
+    MOV R4, R1
+    MOV R6, R2
+
+DIVIDE 
+
+    CMP R4, R6
+    BLO NEXT 
+
+    SUB R4, R4, R6
+    CMP R4, #0 
+    BEW ADD_DIVISOR 
+
+    B DIVIDE 
+
+ADD_DIVISOR
+    ADD R3, R3, R2 
+
+NEXT    
+    ADD R2, R2, #1 
+    B LOOP 
+
+CHECK 
+    CMP R3, R0 
+    BEQ PERFECT 
+
+    MOV R5, #0
+    B STOP 
+
+PERFECT 
+    MOV R5, #1 
+
+STOP 
+    B STOP 
+
+NUM DCD 28
+    END
