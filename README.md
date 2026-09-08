@@ -1,4 +1,4 @@
 ## Midsem Practice Questions
 
-> Midsem content uploading under /MidsemPractice folder
+> Midsem content uploading under /MidsemPractice folder.  
 > Meanwhile to see all Pyq's , visit [LabXam](https://labxam.vercel.app)
