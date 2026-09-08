@@ -10,12 +10,15 @@ Author :
 */
 
 /*
-    Write an ARM assembly program to:
+    Write an ARM Assembly program to:
 
-    - Create a function DIVIDE to divide a 32-bit number by repeated subtraction.
-    - Create a function PRIME which uses DIVIDE to check whether a number is prime.
+    - Create a function PRIME that checks whether a number is prime.
+    - Create a function FACT that calculates factorial using recursion.
     - Create an array of 5 32-bit numbers.
-    - Use PRIME to count the number of prime numbers in the array.
+    - For every number in the array:
+        - If it is prime, calculate its factorial.
+        - Store the factorial in a result array.
+        - If it is not prime, store 0.
 */
 
     AREA RESET, DATA, READONLY
@@ -30,55 +33,60 @@ __Vectors
 	EXPORT Reset_Handler
 Reset_Handler
 
-    LDR R4, =ARRAY           ; Address of array
-    MOV R5, #5               ; 5 elements
-    MOV R6, #0               ; Prime count 
+    LDR R4, =ARRAY 
+    LDR R5, =RESULT 
+    MOV R6, #5
 
 LOOP 
-    LDR R0, [R4]    
+    LDR R0, [R4]
     
-    PUSH {R4, R5, R6, LR}    ; Save array info 
-    BL PRIME                 ; Check whether number is prime    
-    MOV R7, R0               ; Save PRIME result
-    POP {R4, R5, R6, LR} 
+    PUSH {R4, R5, R6, LR}
+    BL PRIME                ; R0 = 1 if prime, else 0
+    MOV R7, R0
+    POP {R4, R5, R6, LR}
 
     CMP R7, #1
-    BNE NOT_PRIME 
+    BNE NOT_PRIME
 
-    ADD R6, R6, #1           ; prime count++;
+    LDR R0, [R4]
+    BL FACT 
+
+    STR R0, [R5]
+    B NEXT 
 
 NOT_PRIME
-    ADD R4, R4, #4           ; move to nxt number 
-    SUB R5, R5, #1
+    MOV R0, #0 
+    STR R0, [R5]
 
-    CMP R5, #0
+NEXT 
+    ADD R4, R4, #4
+    ADD R5, R5, #5
+    SUB R6, R6, #1
+    CMP R6, #0
     BNE LOOP 
 
-    LDR R0, =RESULT
-    STR R6, [R0]            ; Store prime count 
-
 STOP 
-    B STOP 
+    B STOP
 
 PRIME
-    CMP R0, #2
-    BLO NOT_PRIME_FUNC      ; 0 and 1 are not prime 
-
     PUSH {R4, R5, LR}
 
-    MOV R4, R0              ; original number 
-    MOV R5, #2              ; divisor
+    CMP R0, #2
+    BLO NOT_PRIME_FUNC    ; 0 and 1 are not prime
 
-PRIME_LOOP 
+    MOV R4, R0            ; R4 = number
+    MOV R5, #2            ; first divisor = 2
+
+PRIME_LOOP
     CMP R5, R4
-    BHS PRIME_FOUND         ; stop before number itself
+    BHS PRIME_FOUND       ; divisor reached number
 
-    MOV R0, R4              ; number 
-    MOV R1, R5              ; divisor 
-    BL DIVIDE               ; quotient in R0 and remainder in R1
+    MOV R0, R4
+    MOV R1, R5
+    BL DIVIDE
 
-    CMP R1, #0
-    BEQ NOT_PRIME_FUNC      
+    CMP R1, #0            ; remainder == 0?
+    BEQ NOT_PRIME_FUNC
 
     ADD R5, R5, #1
     B PRIME_LOOP
@@ -86,20 +94,22 @@ PRIME_LOOP
 PRIME_FOUND
     MOV R0, #1
     POP {R4, R5, LR}
-    BX LR 
+    BX LR
 
 NOT_PRIME_FUNC
     MOV R0, #0
     POP {R4, R5, LR}
-    BX LR 
+    BX LR
 
-DIVIDE 
-    MOV R2, #0
-    MOV R3, R0
+
+DIVIDE
+    MOV R2, #0            ; quotient
+    MOV R3, R0            ; remainder
 
 DIV_LOOP
     CMP R3, R1
     BLO DIV_DONE
+
     SUB R3, R3, R1
     ADD R2, R2, #1
     B DIV_LOOP
@@ -107,11 +117,31 @@ DIV_LOOP
 DIV_DONE
     MOV R0, R2
     MOV R1, R3
-    BX LR 
+    BX LR
 
 
-ARRAY DCD 7, 10, 13, 15, 17
+FACT
+    CMP R0, #1
+    BLE FACT_BASE
+
+    PUSH {R0, LR}
+
+    SUB R0, R0, #1
+    BL FACT
+
+    MOV R1, R0
+    POP {R0, LR}
+
+    MUL R0, R0, R1
+    BX LR
+
+FACT_BASE
+    MOV R0, #1
+    BX LR
+
+
+ARRAY DCD 5, 8, 3, 10, 7
     AREA DATA, DATA, READWRITE
 
-RESULT DCD 0
+RESULT DCD 0, 0, 0, 0, 0
     END
