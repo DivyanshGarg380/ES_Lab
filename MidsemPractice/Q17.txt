@@ -1,0 +1,36 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Write an ARM Assembly language program using a user-defined function FIB to calculate the Fibonacci number of a given input.
+
+    A 32-bit hexadecimal number is given as input.
+    The program should:
+
+    1. Extract each hexadecimal digit (nibble) from the 32-bit hexadecimal number.
+    2. Pass each individual hexadecimal digit as an argument to the user-defined FIB function.
+    3. The FIB function should calculate the nth Fibonacci number for each digit.
+    4. Store the Fibonacci results corresponding to all the hexadecimal digits in code/read-only memory.
+    5. Additionally, multiply all the hexadecimal digits together.
+    6. Store the final multiplication result in a separate memory location.
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler

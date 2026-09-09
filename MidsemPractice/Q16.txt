@@ -1,0 +1,114 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Write an ARM Assembly program to:
+
+    - Create an array of 5 unsigned 32-bit numbers.
+    - Create a function DIVIDE to divide two numbers using repeated subtraction.
+    - Create a function GCD which uses the DIVIDE function to find the GCD of two numbers.
+    - Using the GCD function, find the LCM of every pair of consecutive elements in the array.
+    - Store the LCM values in another array.
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R6, =ARRAY          ; address of array 
+    LDR R7, =RESULT         ; address of result array 
+    MOV R8, #4              ; loop counter 
+
+LOOP 
+    LDR R0, [R6]            ; R0 = first number 
+    LDR R1, [R6, #4]        ; R1 = next number 
+
+    MOV R4, R0              ; save first number 
+    MOV R5, R1              ; save second number 
+
+    BL GCD                  ; R0 = GCD(R0, R1)
+
+    ; LCM = (first * second) / GCD 
+    MUL R2, R4, R5          ; R2 = first * second 
+    MOV R1, R0              ; R1 = GCD 
+    MOV R0, R2              ; R0 = Product
+    BL DIVIDE               ; R0 = product / GCD 
+
+    STR R0, [R7]
+
+    ADD R6, R6, #4
+    ADD R7, R7, #4
+
+    SUBS R8, R8, #1
+    BNE LOOP
+
+STOP 
+    B STOP 
+
+
+DIVIDE 
+    MOV R2, #0
+
+DIV_LOOP
+    CMP R0, R1
+    BLT DIV_DONE
+
+    SUB R0, R0, R1 
+    ADD R2, R2, #1
+
+    B DIV_LOOP
+
+DIV_DONE 
+    MOV R0, R2
+    BX LR
+
+GCD 
+    PUSH {R4, R5, LR}
+    MOV R4, R0  
+    MOV R5, R1 
+
+GCD_LOOP 
+    CMP R5, #0 
+    BEQ GCD_DONE
+
+    MOV R0, R4
+    MOV R1, R5 
+
+    BL DIVIDE 
+
+    MOV R2, R0
+    MUL R2, R2, R5 
+
+    SUB R0, R4, R2 
+
+    MOV R4, R5
+    MOV R5, R0 
+
+    B GCD_LOOP 
+
+GCD_DONE
+    MOV R0, R4 
+    POP {R4, R5, LR}
+    BX LR
+
+    AREA mydata, DATA, READWRITE 
+
+ARRAY DCD 12, 18, 24, 30, 36
+RESULT DCD 0, 0, 0, 0
+    END
