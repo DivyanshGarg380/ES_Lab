@@ -1,0 +1,222 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Write an ARM Assembly program to perform the following operations on a 32-bit hexadecimal number:
+
+    Given: ``NUMBER = 0x0000002D``
+    
+    - Extract each hexadecimal digit from the 32-bit number.
+    - For every digit:
+        - determine whether the digit is prime (2, 3, 5, 7);
+        - if it is prime, calculate its factorial using a recursive FACT function.
+        - Store the factorial result for every digit in a result array. Store 0 for non-prime digits.
+        - Calculate the GCD of all the non-zero hexadecimal digits using repeated subtraction.
+        - Convert the final GCD into unpacked ASCII.
+        - Store the ASCII result separately.
+        - Calculate the product of all prime hexadecimal digits and store it separately.
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R0, =NUMBER 
+    LDR R1, [R0]            ; original 32 bit number 
+
+    MOV R2, R1              ; working copy of this number for digit extraction
+    LDR R3, =FACT_RESULT    ; factorial result array 
+
+    MOV R4, #1              ; product of prime digits 
+    MOV R5, #0              ; stores GCD (0 means no non-zero digit found yet)
+
+    MOV R6, #8              ; loop counter
+
+LOOP 
+    AND R7, R2, #0x0F       ; current hexa digit 
+
+    ; prime check 
+    CMP R7, #2
+    BEQ PRIME
+
+    CMP R7, #3
+    BEQ PRIME
+
+    CMP R7, #5
+    BEQ PRIME
+
+    CMP R7, #7
+    BEQ PRIME
+
+    CMP R7, #11
+    BEQ PRIME
+
+    CMP R7, #13
+    BEQ PRIME
+
+    B NOT_PRIME
+
+PRIME 
+    MOV R0, R7               ; R0 = prime digit 
+    BL FACT                  ; R0 = fact(digit)
+
+    STR R0, [R3]             ; store fact result 
+
+    MUL R4, R4, R7           
+    B UPDATE_GCD 
+
+NOT_PRIME
+    MOV R0, #0
+    STR R0, [R3]
+
+UPDATE_GCD
+    CMP R7, #0
+    BEQ NEXT_DIGIT            ; ignore zero 
+
+    CMP R5, #0
+    BEQ FIRST_NUMBER          ; first non - zero digit 
+
+GCD_LOOP
+
+    CMP R5, R7
+    BEQ GCD_DONE
+
+    BHI GCD_FIRST_GREATER
+
+    SUB R7, R7, R5
+    B GCD_LOOP
+
+
+GCD_FIRST_GREATER
+
+    SUB R5, R5, R7
+    B GCD_LOOP
+
+
+GCD_DONE
+
+    B NEXT_DIGIT
+
+FIRST_NUMBER
+
+    MOV R5, R7
+
+NEXT_DIGIT
+
+    ADD R3, R3, #4          ; next result location
+
+    MOV R2, R2, LSR #4      ; remove current nibble
+
+    SUB R6, R6, #1
+
+    CMP R6, #0
+    BNE LOOP
+
+    LDR R3, =GCD_ASCII
+
+    MOV R7, R5              ; R7 = final GCD
+
+    CMP R7, #10
+    BLO ASCII_SINGLE
+
+
+
+    SUB R8, R7, #10         ; R8 = digit 0 to 5
+    ADD R8, R8, #0x41       ; convert to ASCII A-F
+
+    STRB R8, [R3]           ; store tens/hex digit
+
+    MOV R8, #0
+    STRB R8, [R3, #1]       ; null/unused second byte
+
+    B STORE_PRODUCT
+
+
+
+ASCII_SINGLE
+
+    ADD R8, R7, #0x30       ; convert number to ASCII
+
+    STRB R8, [R3]           ; store ASCII character
+
+    MOV R8, #0
+    STRB R8, [R3, #1]
+
+
+
+STORE_PRODUCT
+
+    LDR R3, =PRODUCT
+    STR R4, [R3]            ; store product of prime digits
+
+
+STOP
+
+    B STOP
+
+
+
+FACT
+
+    CMP R0, #1
+    BLE FACT_BASE
+
+    PUSH {R0, LR}            ; save n and return address
+
+    SUB R0, R0, #1
+    BL FACT                  ; calculate FACT(n-1)
+
+    POP {R1, LR}             ; R1 = original n
+
+    MUL R0, R0, R1           ; n × FACT(n-1)
+
+    BX LR
+
+
+FACT_BASE
+
+    MOV R0, #1
+    BX LR
+
+
+
+NUMBER
+
+    DCD 0x0000002D
+
+
+    AREA DATA, DATA, READWRITE
+
+
+FACT_RESULT
+
+    DCD 0,0,0,0,0,0,0,0
+
+
+GCD_ASCII
+
+    DCB 0,0
+
+
+PRODUCT
+
+    DCD 0
+
+
+    END

@@ -1,0 +1,63 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Write an ARM Assembly program to:
+
+    - Create an array of 8 32-bit numbers in memory.
+    - Copy the array into another memory location.
+    - While copying, store the elements in reverse order.
+    - Calculate the sum of all the elements of the original array.
+    - Store the reversed array and the sum separately.
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R0, =ARRAY 
+    LDR R1, =REVERSED 
+
+    ADD R2, R0, #28         ; address of last element
+    MOV R3, #8              ; loop counter 
+    MOV R4, #0              ; sum 
+
+LOOP 
+    LDR R5, [R2]            ; curr element 
+    STR R5, [R1]            ; store in reversed array 
+
+    ADD R4, R4, R5          ; SUM  
+    ADD R1, R1, #4          ; next el
+    SUB R2, R2, #4          ; next destination
+
+    SUBS R3, R3, #1
+    BNE loop
+
+    LDR R6, =SUM
+    STR R4, [R6]
+
+STOP 
+    B STOP
+
+ARRAY DCD 10, 20, 30, 40, 50, 60, 70, 80
+    AREA DATA, DATA, READWRITE
+
+REVERSED DCD 0, 0, 0, 0, 0, 0, 0, 0
+SUM DCD 0
+    END
