@@ -1,0 +1,79 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Write an ARM Assembly program to:
+
+    - Create an array of 5 two-digit hexadecimal numbers.
+    - Convert each hexadecimal number into its equivalent packed BCD representation.
+    - Store all BCD results in another array.
+    - Calculate the sum of the original hexadecimal numbers.
+    - Store the final sum separately.
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R0, =ARRAY          ; R0 = address of input array 
+    LDR R3, =RESULT         ; R3 = address of result array 
+    MOV R2, #5              ; loop counter
+    MOV R4, #0              ; Final sum to be stored
+
+LOOP 
+    LDRB R1, [R0]           ; current hexa number
+    ADD R4, R4, R1          ; add original value to sum 
+
+    MOV R5, R1              ; number for BCD conversion
+    MOV R6, #0              ; R6 = tens digit
+
+TENS_LOOP
+    CMP R5, #10
+    BLO BCD_DONE
+
+    SUB R5, R5, #10         ; subtract 10
+    ADD R6, R6, #1          ; increase tens digit
+
+    B TENS_LOOP
+
+BCD_DONE
+    LSL R6, R6, #4           ; move tens digit to actual tenth position
+    ADD R6, R6, R5           ; add units digit
+
+    STRB R6, [R3]            
+
+    ADD R0, R0, #1
+    ADD R3, R3, #1
+
+    SUBS R2, R2, #1
+    BNE LOOP 
+
+    LDR R7, =SUM 
+    STR R4, [R7]
+
+STOP 
+    B STOP
+
+ARRAY DCB 0x12, 0x25, 0x37, 0x48, 0x59
+    AREA DATA, DATA, READWRITE
+
+RESULT DCB 0, 0, 0, 0, 0
+
+SUM DCD 0
+    END

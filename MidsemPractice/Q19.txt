@@ -1,0 +1,65 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Write an ARM Assembly program to:
+
+    - Store 8 hexadecimal digits in unpacked form in memory.
+    - Convert the 8 unpacked hexadecimal digits into a 32-bit packed hexadecimal number.
+    - During conversion, calculate the sum of all 8 hexadecimal digits.
+    - Store the final packed 32-bit number and the sum in separate memory locations.
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R0, =UNPACKED       ; address of unpacked digits 
+    MOV R1, #0              ; R1 = packed result
+    MOV R2, #0              ; R2 = sum
+    MOV R3, #8              ; loop counter
+
+LOOP 
+    LDRB R4, [R0]           ; current digit 
+    ADD R2, R2, R4          ; add to sum 
+
+    LSL R1, R1, #4
+    ADD R1, R1, R4          ; insert digit 
+
+    ADD R0, R0, #1          ; next digit 
+    SUBS R3, R3, #1
+    BNE LOOP 
+
+    LDR R5, =PACKED 
+    STR R1, [R5]            ; store the packed 32 bit number 
+
+    LDR R6, =SUM 
+    STR R2, [R6]            ; store sum 
+
+STOP 
+    B STOP 
+
+UNPACKED 
+    DCB 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08
+
+    AREA DATA, DATA, READWRITE
+
+PACKED DCD 0
+SUM DCD 0
+    END
