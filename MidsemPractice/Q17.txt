@@ -34,3 +34,76 @@ __Vectors
 	ENTRY
 	EXPORT Reset_Handler
 Reset_Handler
+
+    LDR R0, =NUMBER 
+    LDR R0, [R0]            ; stores the 32 bit hexa number 
+    MOV R9, R0              ; copy used for extracting digits 
+
+    LDR R3, =RESULT         ; result array address 
+    MOV R4, #1              ; multiplication result 
+    MOV R2, #8              ; 8 hexa digits 
+
+LOOP 
+    AND R1, R9, #0x0F       ; current hexa digit 
+    MUL R4, R4, R1          ; multiplication result *= digit 
+
+    MOV R0, R1              ; pass digit to FIB 
+    BL FIB                  ; R0 = FIB(digit)
+
+    STR R0, [R3]            ; store fiboncci result 
+    ADD R3, R3, #4
+
+    MOV R9, R9, LSR #4      ; remove current digit 
+
+    SUBS R2, R2, #1
+    BNE LOOP 
+
+    LDR R6, =PRODUCT
+    STR R4, [R6]
+
+STOP 
+    B STOP 
+
+
+FIB 
+    CMP R0, #0
+    BEQ FIB_ZERO
+
+    CMP R0, #1
+    BEQ FIB_ONE
+
+    PUSH {R0, LR}
+
+    SUB R0, R0, #1
+    BL FIB                  ; FIB(n-1)
+
+    MOV R5, R0              ; R5 = FIB(n-1)
+
+    POP {R0, LR}
+
+    PUSH {R5, LR} 
+
+    SUB R0, R0, #2
+    BL FIB                  ; FIB(n-2)
+
+    POP {R5, LR} 
+
+    ADD R0, R0, R5          ; FIB(n) = FIB(n-1) + FIB(n-2)
+    BX LR 
+
+FIB_ZERO 
+    MOV R0, #0
+    BX LR
+
+FIB_ONE
+    MOV R0, #1
+    BX LR
+
+NUMBER DCD 0x12345678
+    AREA DATA, DATA, READWRITE 
+
+RESULT DCD 0, 0, 0, 0, 0, 0, 0, 0
+PRODUCT DCD 0
+    END
+    
+
