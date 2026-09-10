@@ -1,0 +1,97 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Given a 32-bit number N, find all its proper divisors (excluding N itself).
+    For every proper divisor:
+
+    - Calculate its factorial using a recursive function FACT.
+    - Store the factorial result sequentially in memory.
+    - Store the total number of proper divisors in COUNT.
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R8, =NUMBER 
+    LDR R8, [R8]            ; original number 
+
+    LDR R3, =RESULT         ; result array address
+    MOV R2, #1              ; current divisor 
+    MOV R4, #0              ; divisor count 
+
+LOOP 
+    CMP R2, R8
+    BHS DONE                ; stop before N itself
+
+    MOV R5, R8              ; save the number 
+
+CHECK_DIVISIBILITY
+    CMP R5, R2         
+    BLO CHECK_RESULT  
+
+    SUB R5, R5, R2 
+    B CHECK_DIVISIBILITY
+
+CHECK_RESULT 
+    CMP R5, #0
+    BNE NEXT_DIVISOR
+
+    ; R2 is a proper divisor
+    MOV R0, R2             ; R0 = fact input 
+    BL FACT                ; R0 = fact output 
+
+    STR R0, [R3]           ; store fact 
+    ADD R3, R3, #4
+    ADD R4, R4, #1         ; count++;
+
+NEXT_DIVISOR
+    ADD R2, R2, #1
+    B LOOP
+
+DONE 
+    LDR R6, =COUNT 
+    STR R4, [R6] 
+
+STOP 
+    B STOP 
+
+FACT
+    CMP R0, #1 
+    BLE FACT_BASE 
+
+    PUSH {R0, LR}          ; save n 
+    BL FACT                ; R0 gets FACT(N-1)
+
+    POP {R1, LR}           ; R1 = original n 
+    MUL R0, R0, R1         ; FACT(n) = FACT(n-1) * n
+
+    BX LR 
+
+FACT_BASE   
+    MOV R0, #1
+    BX LR
+
+NUMBER DCD 6
+    AREA DATA, DATA, READWRITE 
+
+RESULT DCD 0, 0, 0, 0, 0
+COUNT DCD 0
+    END

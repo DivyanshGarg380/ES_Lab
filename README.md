@@ -1,3 +1,8 @@
+# ES LAB
+
+### Phase-1: Assembly 💀  
+### Phase-2: Embedded-C 💀
+
 ## Midsem Practice Questions
 
 > Midsem content uploading under /MidsemPractice folder.  

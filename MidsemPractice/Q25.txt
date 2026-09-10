@@ -1,0 +1,83 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Given two 32-bit numbers, find their GCD using repeated subtraction.
+    Then calculate the factorial of the GCD using a recursive FACT function and store the result in RESULT.
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R4, =NUM 
+    LDR R4, [R4]
+
+    LDR R5, =NUM2
+    LDR R5, [R5]
+
+GCD_LOOP
+    CMP R4, R5 
+    BEQ GCD_DONE
+
+    BHI FIRST_GREATER
+
+    SUB R5, R5, R4 
+    B GCD_LOOP
+
+FIRST_GREATER
+    SUB R4, R4, R5
+    B GCD_LOOP
+
+GCD_DONE 
+    ; R4 contains the GCD
+    MOV R0, R4              ; R0 = GCD 
+    BL FACT                 ; R0 = FACT(GCD)
+
+    LDR R6, =RESULT 
+    STR R0, [R6]
+
+STOP 
+    B STOP 
+
+
+FACT 
+    CMP R0, #1 
+    BLE FACT_BASE
+
+    PUSH {R0, LR}
+
+    SUB R0, R0, #1
+    BL FACT 
+
+    POP {R1, LR}
+
+    MUL R0, R0, R1
+    BX LR 
+
+FACT_BASE 
+    MOV R0, #1
+    BX LR 
+
+NUM DCD 48 
+NUM2 DCD 18
+    AREA DATA, DATA, READWRITE
+
+RESULT DCD 0
+    END
