@@ -1,0 +1,109 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Write an ARM Assembly language program to:
+
+    - Create a function SUMDIV to calculate the sum of all proper divisors of a 32-bit number.
+    - Create a function PRIME which uses SUMDIV to determine whether the number is prime.
+    - For a given number, store 1 if it is prime and 0 otherwise.
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R0, =NUM 
+    LDR R0, [R0]            ; Starting number 
+
+    BL PRIME                ; R0 = 1 if prime else 0 
+    MOV R5, R0              ; prime result 
+
+    LDR R6, =RESULT 
+    STR R5, [R6] 
+
+STOP 
+    B STOP 
+
+
+PRIME 
+    CMP R0, #2 
+    BLO NOT_PRIME           ; 0 and 1 are not prime 
+
+    MOV R4, R0              ; save original number 
+    BL SUMDIV               ; R0 = sum of proper divisors 
+
+    CMP R0, #1
+    BEQ IS_PRIME
+
+NOT_PRIME 
+    MOV R0, #0
+    BX LR 
+
+IS_PRIME 
+    MOV R0, #1
+    BX LR 
+
+
+SUM_DIV
+    MOV R1, #1              ; first divisor 
+    MOV R2, #0              ; sum 
+
+DIVISOR_LOOP
+    CMP R1, R4
+    BHS SUM_DONE            ; R1 >= R4
+
+    MOV R0, R4              ; dividend
+    MOV R7, R1              ; divisor 
+
+    MOV R3, #0              ; quotient
+    MOV R0, R4              ; remainder = number 
+
+REPEATED_SUBTRACTION
+    CMP R0, R7
+    BLO CHECK_DIVISOR
+
+    SUB R0, R0, R7 
+    ADD R3, R3, #1
+
+    B REPEATED_SUBTRACTION
+
+CHECK_DIVISOR
+    CMP R0, #0
+    BNE NEXT_DIVISOR
+
+    ADD R2, R2, R1          ; sum += divisor 
+
+NEXT_DIVISOR
+    ADD R1, R1, #1
+    B DIVISOR_LOOP
+
+SUM_DONE 
+    MOV R0, R2              ; return sum 
+    BX LR
+
+NUMBER
+    DCD 13
+
+    AREA DATA, DATA, READWRITE
+
+RESULT
+    DCD 0
+
+    END

@@ -1,0 +1,80 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Write an ARM Assembly language program to:
+
+    - Create a function GCD to find the GCD of two 32-bit unsigned numbers using repeated subtraction.
+    - Create an array of 5 32-bit numbers.
+    - Find the GCD of all the numbers in the array using the GCD function.
+    - Store the final GCD in memory.
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R2, =ARRAY          ; address of the array 
+    LDR R4, [R2]            ; first number 
+    ADD R2, R2, #4          ; move to 2nd number 
+    MOV R3, #4              ; loop counter 
+
+LOOP 
+    LDR R5, [R2]            ; the next number 
+    MOV R0, R4              ; the current GCD
+    MOV R1, R5              ; the next number 
+
+    BL GCD                  ; R0 = GCD(R0, R1) 
+
+    MOV R4, R0              ; update current GCD 
+    ADD R2, R2, #4          ; move to next element 
+
+    SUBS R3, R3, #1
+    BNE LOOP
+
+    LDR R5, =RESULT
+    STR R4, [R5]            ; final answer
+
+STOP 
+    B STOP 
+
+
+GCD 
+
+GCD_LOOP
+    CMP R0, R1              
+    BEQ GCD_DONE            ; if equal
+
+    BHI FIRST_GREATER       ; if R0 > R1
+
+    SUB R1, R1, R0          ; R1 -= R0 
+    B GCD_LOOP 
+
+FIRST_GREATER 
+    SUB R0, R0, R1          ; R0 -= R1 
+    B GCD_LOOP 
+
+GCD_DONE 
+    BX LR 
+
+ARRAY DCD 48, 72, 96, 120, 144
+    AREA DATA, DATA, READWRITE
+
+RESULT DCD 0
+    END
