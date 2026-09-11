@@ -28,21 +28,25 @@ __Vectors
 Reset_Handler
 
     LDR R0, =UNPACKED
-    LDR R1, [R0]
+    MOV R1, #0              ; packed result
+    MOV R2, #8              ; loop counter
 
-    AND R2, R1, #0x0F
-    MOV R3, R1, LSR #4
-    AND R3, R3, #0x0F
+LOOP 
+    LDRB R3, [R0]
+    MOV R1, R1, LSL #4
 
-    ORR R2, R2, R3, LSL #4
+    ORR R1, R1, R3
+    ADD R0, R0, #1
+    SUBS R2, R2, #1
+    BNE LOOP 
 
-    LDR R0, =RESULT
-    STR R2, [R0]
+    LDR R4, =RESULT
+    STR R1, [R4]
 
 STOP
     B STOP
 
-UNPACKED DCD 0x00000205
+UNPACKED DCB 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08
     AREA data, DATA, READWRITE
 
 RESULT DCD 0
