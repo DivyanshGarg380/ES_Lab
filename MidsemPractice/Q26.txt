@@ -1,0 +1,95 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Given an array of 8 32-bit numbers, use the user-defined PRIME function to find the largest prime number in the array.
+    If no prime exists, store 0.
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R4, =ARRAY          ; array address
+    MOV R5, #8              ; loop counter
+    MOV R6, #0              ; largest prime 
+
+LOOP 
+    LDR R0, [R4]            ; current element
+    BL PRIME                ; R0 = 1 if prime else 0
+
+    CMP R0, #1
+    BNE NOT_PRIME
+
+    LDR R7, [R4]            ; current number 
+    CMP R7, R6 
+    BLE NOT_PRIME 
+
+    MOV R6, R7              ; largest prime stored
+     
+NOT_PRIME 
+    ADD R4, R4, #4
+    SUBS R5, R5, #1
+    BNE LOOP 
+
+    LDR R8, =RESULT
+    STR R6, [R8]
+
+STOP 
+    B STOP 
+
+PRIME
+    CMP R0, #2
+    BLO NOTPRIME 
+
+    MOV R1, #2
+
+PRIME_LOOP
+    CMP R1, R0 
+    BEQ IS_PRIME
+
+    MOV R2, R0              ; number to divide
+
+DIV_LOOP 
+    CMP R2, R1
+    BLO DIV_DONE
+
+    SUB R2, R2, R1
+    B DIV_LOOP
+
+DIV_DONE 
+    CMP R2, #0
+    BEQ NOTPRIME
+
+    ADD R1, R1, #1
+    B PRIME_LOOP
+
+IS_PRIME
+    MOV R0, #1
+    BX LR
+
+NOTPRIME
+    MOV R0, #0
+    BX LR 
+
+ARRAY DCD 12, 17, 25, 31, 42, 19, 20, 29
+    AREA DATA, DATA, READWRITE
+
+RESULT DCD 0
+    END

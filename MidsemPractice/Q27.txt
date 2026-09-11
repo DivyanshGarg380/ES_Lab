@@ -1,0 +1,104 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Given three 32-bit numbers, find their LCM.
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R4, =NUM1
+    LDR R4, [R4]
+
+    LDR R5, =NUM2 
+    LDR R5, [R5]
+
+    MOV R0, R4 
+    MOV R1, R5 
+    BL GCD                  ; R0 contains the GCD
+
+    MOV R6, R0              ; R6 contains the GCD  
+
+    MUL R7, R4, R5          ; R7 = A * B 
+    MOV R0, R7              ; dividend
+    MOV R1, R6              ; divisor
+
+    BL DIVIDE               ; R2 = quotient
+    MOV R4, R2              ; LCM of the first two
+    
+    LDR R5, =NUM3 
+    LDR R5, [R5]
+    MOV R0, R4
+    MOV R1, R5
+    BL GCD                  ; R0 = GCD 
+
+    MOV R6, R0              
+    MUL R7, R4, R5          ; dividend  
+    MOV R1, R6              ; divisor 
+    BL DIVIDE 
+
+    MOV R4, R2              ; final LCM 
+    LDR R8, =RESULT 
+    STR R4, [R8]    
+
+STOP 
+    B STOP 
+
+GCD 
+
+GCD_LOOP 
+    CMP R0, R1 
+    BEQ GCD_DONE
+
+    BHI FIRST_GREATER
+
+    SUB R1, R1, R0 
+    B GCD_LOOP
+
+FIRST_GREATER 
+    SUB R0, R0, R1 
+    B GCD_LOOP
+
+GCD_DONE
+    BX LR
+
+DIVIDE  
+    MOV R2, #0 
+
+DIVIDE_LOOP 
+    CMP R0, R1 
+    BLO DIVIDE_DONE
+
+    SUB R0, R0, R1 
+    ADD R2, R2, #1 
+
+    B DIVIDE_LOOP
+
+DIVIDE_DONE
+    BX LR 
+
+NUM1 DCD 12
+NUM2 DCD 18
+NUM3 DCD 30
+    AREA DATA, DATA, READWRITE
+
+RESULT DCD 0
+    END

@@ -1,0 +1,83 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Given an array of 5 numbers, use the user-defined DIVIDE function to determine the number of divisors of each number.
+    Store the divisor count for every number in a result array.
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R4, =ARRAY  
+    LDR R5, =RESULT
+    MOV R6, #5              ; loop counter 
+
+NUMBER_LOOP 
+    LDR R7, [R4]            ; current number 
+    MOV R2, #1              ; current divisor 
+    MOV R3, #0              ; divisor count
+
+DIVISION_LOOP 
+    CMP R2, R7
+    BHI STORE_COUNT
+
+    MOV R0, R7              ; dividend
+    MOV R1, R2              ; divisor 
+    BL DIVIDE 
+
+    CMP R0, #0
+    BNE NOT_DIVISOR
+
+    ADD R3, R3, #1
+
+NOT_DIVISOR
+    ADD R2, R2, #1
+    B DIVISION_LOOP
+
+STORE_COUNT
+    STR R3, [R5]
+    ADD R4, R4, #4
+    ADD R5, R5, #4
+
+    SUBS R6, R6, #1
+    BNE NUMBER_LOOP
+
+STOP 
+    B STOP 
+
+DIVIDE 
+
+DIVIDE_LOOP
+    CMP R0, R1
+    BLO DIVIDE_DONE
+
+    SUB R0, R0, R1
+    B DIVIDE_LOOP
+
+DIVIDE_DONE 
+    BX LR 
+
+
+ARRAY DCD 12, 15, 20, 25, 30
+    AREA DATA, DATA, READWRITE
+
+RESULT DCD 0, 0, 0, 0, 0
+    END
