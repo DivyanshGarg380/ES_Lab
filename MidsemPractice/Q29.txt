@@ -1,0 +1,135 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Write an ARM Assembly program to add two 96-bit numbers.
+
+    - Each 96-bit number is stored as three 32-bit words.
+    - Store the 96-bit result as three 32-bit words in memory.
+    - For each result word, count the number of 1s.
+    - Using the given parity scheme:
+        - even number of 1s → store 1
+        - odd number of 1s → store 0
+    
+    - Store the three parity results in memory.
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R0, =NUM1 
+    LDR R1, [R0]            ; R1 = NUM1 HIGH
+    LDR R2, [R0, #4]        ; R2 = NUM1 MID
+    LDR R3, [R0, #8]        ; R3 = NUM1 LOW
+
+    LDR R0, =NUM2
+    LDR R4, [R0]            ; R4 = NUM2 HIGH
+    LDR R5, [R0, #4]        ; R5 = NUM2 MID
+    LDR R6, [R0, #8]        ; R6 = NUM2 LOW
+
+    ADDS R3, R3, R6         ; LOW + LOW
+    ADCS R2, R2, R5         ; MID + MID + carry
+    ADCS R1, R1, R4         ; HIGH + HIGH + carry 
+
+    LDR R0, =RESULT 
+    STR R1, [R0]            ; HIGH 
+    STR R2, [R0, #4]        ; MID 
+    STR R3, [R0, #8]        ; LOW
+
+    ; Count 1's + PARITY allocation
+
+    ; HIGH first 
+    LDR R7, [R0]
+    MOV R8, #0              ; count 
+
+HIGH_LOOP
+    AND R10, R7, #1         ; check bit 
+    CMP R10, #0 
+    BEQ HIGH_SKIP
+
+    ADD R8, R8, #1          ; count++
+
+HIGH_SKIP
+    LSR R7, R7, #1          ; shift right
+    CMP R7, #0
+    BNE HIGH_LOOP
+
+; EVEN = 0
+; ODD = 1
+    AND R8, R8, #1
+    STR R8, [R0]            ; store high 
+
+    ; MID now
+    LDR R7, [R0, #4]
+    MOV R8, #0
+
+MID_LOOP
+    AND R10, R7, #1
+    CMP R10, #0
+    BEQ MID_SKIP 
+
+    ADD R8, R8, #1
+
+MID_SKIP   
+    LSR R7, R7, #1
+    CMP R7, #0
+    BNE MID_LOOP
+
+    AND R8, R8, #1
+    STR R8, [R0, #4]
+
+    ; LOW now
+    LDR R7, [R0, #8]    
+    MOV R8, #0
+
+LOW_LOOP
+
+    AND R10, R7, #1
+    CMP R10, #0
+    BEQ LOW_SKIP
+
+    ADD R8, R8, #1
+
+LOW_SKIP
+
+    LSR R7, R7, #1
+    CMP R7, #0
+    BNE LOW_LOOP
+
+    AND R8, R8, #1
+
+    STR R8, [R0, #8]
+
+STOP
+    B STOP 
+
+NUM1
+    DCD 0x00000001, 0xFFFFFFFF, 0xFFFFFFFF
+
+NUM2
+    DCD 0x00000002, 0x00000000, 0x00000001
+
+    AREA DATA, DATA, READWRITE
+
+RESULT
+    DCD 0, 0, 0
+
+    END
+

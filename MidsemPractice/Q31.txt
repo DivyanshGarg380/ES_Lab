@@ -1,0 +1,70 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Given two 32-bit hexadecimal numbers N1 and N2 stored in code memory, calculate the sum of the products of corresponding hexadecimal digits.
+    Store the result in data memory.
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R0, =NUM1
+    LDR R0, [R0]
+
+    LDR R1, =NUM2
+    LDR R1, [R1]
+
+    MOV R2, #0              ; sum
+    MOV R3, #8              ; loop counter
+
+LOOP 
+    AND R4, R0, #0x0F       ; digit from NUM1 
+    AND R5, R1, #0x0F       ; digit from NUM2 
+
+    MUL R6, R4, R5 
+    ADD R2, R2, R6 
+
+    LSR R0, R0, #4
+    LDR R1, R1, #4
+
+    SUBS R3, R3, #1
+    BNE LOOP
+
+    LDR R7, =RESULT
+    STR R2, [R7]
+
+STOP
+    B STOP
+
+
+NUM1
+    DCD 0x12345678
+
+NUM2
+    DCD 0x11111111
+
+
+    AREA DATA, DATA, READWRITE
+
+RESULT
+    DCD 0
+
+    END

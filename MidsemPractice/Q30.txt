@@ -1,0 +1,118 @@
+/*
+Author :
+
+███████╗████████╗ █████╗ ██████╗  ███╗   ███╗ █████╗ ███╗   ██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗ ████╗ ████║██╔══██╗████╗  ██║
+███████╗   ██║   ███████║██████╔╝ ██╔████╔██║███████║██╔██╗ ██║
+╚════██║   ██║   ██╔══██║██║  ██║ ██║╚██╔╝██║██╔══██║██║╚██╗██║
+███████║   ██║   ██║  ██║██║  ██║ ██║ ╚═╝ ██║██║  ██║██║ ╚████║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  STARMAN248
+*/
+
+/*
+    Write an ARM Assembly program to:
+
+    - Subtract two 64-bit numbers using a function.
+    - Use the same function to subtract a third 64-bit number.
+    - Count the number of 1s in the final 64-bit result.
+    - Store the count in memory.
+*/
+
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R4, =NUM1
+    LDR R0, [R4]            ; R0 = HIGH
+    LDR R1, [R4, #4]        ; R1 = LOW 
+
+    LDR R4, =NUM2
+    LDR R2, [R4]            ; R2 = HIGH
+    LDR R3, [R4, #4]        ; R3 = LOW 
+
+    BL SUBTRACT             ; NUM1 - NUM2 
+
+    ; Result is stored like: R0 = HIGH, R1 = LOW
+
+    LDR R4, =NUM3
+    LDR R2, [R4]            ; R2 = HIGH 
+    LDR R3, [R4, #4]        ; R3 = LOW 
+
+    BL SUBTRACT             ; (NUM1 - NUM2) - NUM3
+
+    LDR R4, =RESULT 
+    STR R0, [R4]
+    STR R1, [R4, #4]
+
+    ; COUNT 1's now
+    ; HIGH first
+    MOV R5, R0              ; HIGH 
+    MOV R6, #0              ; count 
+
+HIGH_LOOP
+    AND R7, R5, #1
+    CMP R7, #0
+    BEQ HIGH_SKIP
+
+    ADD R6, R6, #1
+
+HIGH_SKIP
+    LSR R5, R5, #1
+    CMP R5, #0
+    BNE HIGH_LOOP
+
+    ; LOW now
+
+LOW_LOOP
+    AND R7, R5, #1
+    CMP R7, #0
+    BEQ LOW_SKIP
+
+    ADD R6, R6, #1
+
+LOW_SKIP
+    LSR R5, R5, #1
+    CMP R5, #0
+    BNE LOW_LOOP
+
+
+    ; Store total count
+    LDR R4, =COUNT
+    STR R6, [R4]
+
+STOP
+    B STOP
+
+SUBTRACT    
+    SUBS R1, R1, R3 
+    SBC R0, R0, R2 
+
+    BX LR 
+
+NUM1
+    DCD 0x00000002, 0x00000010
+
+NUM2
+    DCD 0x00000001, 0x00000005
+
+NUM3
+    DCD 0x00000000, 0x00000003
+
+
+    AREA DATA, DATA, READWRITE
+
+RESULT
+    DCD 0, 0
+
+COUNT
+    DCD 0
+
+    END
