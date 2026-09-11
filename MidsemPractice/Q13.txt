@@ -35,83 +35,77 @@ Reset_Handler
     MOV R6, #0               ; Prime count 
 
 LOOP 
-    LDR R0, [R4]    
-    
-    PUSH {R4, R5, R6, LR}    ; Save array info 
-    BL PRIME                 ; Check whether number is prime    
-    MOV R7, R0               ; Save PRIME result
-    POP {R4, R5, R6, LR} 
+    LDR R0, [R4]             ; current number 
+    BL PRIME                 ; R0 = 1 if prime else 0
 
-    CMP R7, #1
+    CMP R0, #1 
     BNE NOT_PRIME 
 
-    ADD R6, R6, #1           ; prime count++;
+    ADD R6, R6, #1           ; prime++;
 
 NOT_PRIME
-    ADD R4, R4, #4           ; move to nxt number 
-    SUB R5, R5, #1
-
-    CMP R5, #0
+    ADD R4, R4, #4
+    SUBS R5, R5, #1
     BNE LOOP 
-
-    LDR R0, =RESULT
-    STR R6, [R0]            ; Store prime count 
+    
+    LDR R7, =RESULT
+    STR R6, [R7]
 
 STOP 
     B STOP 
 
+
 PRIME
     CMP R0, #2
-    BLO NOT_PRIME_FUNC      ; 0 and 1 are not prime 
+    BLO NOT_PRIME_FUNC
 
-    PUSH {R4, R5, LR}
+    MOV R7, R0              ; dividend
+    MOV R8, #2              ; divisor 
 
-    MOV R4, R0              ; original number 
-    MOV R5, #2              ; divisor
+PRIME_LOOP
+    CMP R8, R7 
+    BHS PRIME_FOUND         ; stop at number itself 
 
-PRIME_LOOP 
-    CMP R5, R4
-    BHS PRIME_FOUND         ; stop before number itself
+    MOV R0, R7              ; R0 = number 
+    MOV R1, R8              ; R1 = divisor 
 
-    MOV R0, R4              ; number 
-    MOV R1, R5              ; divisor 
-    BL DIVIDE               ; quotient in R0 and remainder in R1
+    BL DIVIDE               ; R0 = quotient and R1 = remainder 
 
     CMP R1, #0
-    BEQ NOT_PRIME_FUNC      
+    BEQ NOT_PRIME_FUNC
 
-    ADD R5, R5, #1
+    ADD R8, R8, #1
     B PRIME_LOOP
+
 
 PRIME_FOUND
     MOV R0, #1
-    POP {R4, R5, LR}
     BX LR 
 
 NOT_PRIME_FUNC
     MOV R0, #0
-    POP {R4, R5, LR}
-    BX LR 
+    BX LR
 
 DIVIDE 
-    MOV R2, #0
-    MOV R3, R0
+    MOV R2, #0              ; quotient
+    MOV R3, R0              ; dividend 
 
-DIV_LOOP
-    CMP R3, R1
+DIV_LOOP    
+    CMP R3, R1 
     BLO DIV_DONE
+    
     SUB R3, R3, R1
     ADD R2, R2, #1
-    B DIV_LOOP
 
-DIV_DONE
+    B DIV_LOOP 
+
+DIV_DONE 
     MOV R0, R2
     MOV R1, R3
     BX LR 
 
-
 ARRAY DCD 7, 10, 13, 15, 17
-    AREA DATA, DATA, READWRITE
+    AREA DAA, DATA, READWRITE 
 
 RESULT DCD 0
     END
