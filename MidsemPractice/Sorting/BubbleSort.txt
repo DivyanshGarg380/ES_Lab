@@ -1,0 +1,42 @@
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R0, =ARRAY          ; initial address
+    MOV R1, #5              ; loop counter
+
+OUTER_LOOP
+    MOV R2, R0              ; current address 
+    MOV R3, R1              ; comparisons
+
+INNER_LOOP 
+    LDR R4, [R2]            ; current element
+    LDR R5, [R2, #4]        ; next element
+
+    CMP R4, R5 
+    BLE NO_SWAP 
+
+    STR R5, [R2]
+    STR R4, [R2, #4]
+
+NO_SWAP 
+    ADD R2, R2, #4
+    SUBS R3, R3, #1
+    BNE INNER_LOOP
+
+    SUBS R1, R1, #1
+    BNE OUTER_LOOP
+
+STOP 
+    B STOP 
+
+ARRAY DCD 40, 10, 30, 20, 50
+    END

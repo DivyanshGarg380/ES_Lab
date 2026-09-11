@@ -1,0 +1,59 @@
+    AREA RESET, DATA, READONLY
+ 	EXPORT __Vectors
+__Vectors
+	DCD 0x10001000 			; stack pointer value when stack is empty
+ 	DCD Reset_Handler 		; reset vector
+
+ 	ALIGN
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+Reset_Handler
+
+    LDR R0, =ARRAY
+    MOV R1, #0              ; current pos i = 0
+    MOV R2, #8              ; loop counter
+
+OUTER_LOOP
+    MOV R3, R1              ; min index = i 
+    ADD R4, R1, #1          ; j = i + 1
+
+INNER_LOOP
+    CMP R4, R2              ; j >= size
+    BGE DO_SWAP
+
+    LDR R5, [R0, R4, LSL #2]    ; curr element
+    LDR R6, [R0, R3, LSL #2]    ; min element 
+
+    CMP R5, R6 
+    BGE NOT_SMALLER 
+
+    MOV R3, R4                  ; new min indx 
+
+NOT_SMALLER
+
+    ADD R4, R4, #1
+    B INNER_LOOP
+
+
+SWAP
+
+    LDR R5, [R0, R1, LSL #2]
+    LDR R6, [R0, R3, LSL #2]
+
+    STR R6, [R0, R1, LSL #2]
+    STR R5, [R0, R3, LSL #2]
+
+    ADD R1, R1, #1
+
+    CMP R1, #7
+    BLT OUTER_LOOP
+
+STOP
+    B STOP
+
+
+ARRAY
+    DCD 6,3,8,2,7,1,5,4
+
+    END
