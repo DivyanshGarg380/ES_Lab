@@ -24,7 +24,7 @@ int main(void) {
     LPC_PINCON->PINSEL0 = 0;
     LPC_PINCON->PINSEL4 = 0;
     LPC_GPIO0->FIODIR |= 0xFF0;
-    LPC_GPIO2->FIODIR |= (1 << 12);
+    LPC_GPIO2->FIODIR &= ~(1 << 12);
 
     while(1) {
         LPC_GPIO0->FIOCLR = 0xFF0;

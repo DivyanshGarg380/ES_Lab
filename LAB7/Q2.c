@@ -29,7 +29,7 @@ int main(void) {
 
     while(1) {
         LPC_GPIO0->FIOCLR = 0xFF0;
-        LPC_GPIO0->FIOSET count << ;
+        LPC_GPIO0->FIOSET = count << 4;
 
         delay();
         if(LPC_GPIO2->FIOPIN & (1 << 12)) {
