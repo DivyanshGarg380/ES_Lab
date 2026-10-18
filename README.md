@@ -9,3 +9,8 @@
 > Meanwhile to see all Pyq's , visit [LabXam](https://labxam.vercel.app)
 
 > Midsem over, most questions were from this repo 🫡
+
+## Endsem Practice Questions
+
+> Endsem content uploading under /EndsemPractice folder.   
+> Meanwhile to see all Pyq's , visit [LabXam](https://labxam.vercel.app)
