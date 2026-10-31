@@ -95,14 +95,14 @@ int main(void) {
         dig3 = count / 10;
         dig4 = count % 10;
 
-        for(i = 0; i < 1000; ++i) Display();
+        for(i = 0; i < 100; ++i) Display();
 
         if(LPC_GPIO2->FIOPIN & (1 << 0)) {
             // SW2 pressed -> UP counter
-            if(count < max_count) count += 2;
+            if(count >= 2) count -= 2;
         } else {
             // SW2 released -> Down counter
-            if(count >= 2) count -= 2;
+            if(count < max_count) count += 2;
         }
     }
 }
