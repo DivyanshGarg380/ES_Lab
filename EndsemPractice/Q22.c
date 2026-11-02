@@ -31,7 +31,7 @@ int main(void) {
     SystemCoreClockUpdate();
 
     LPC_PINCON->PINSEL3 = 0xC0000000;
-    LPC_PINCON->PINSEL0 = 0; // P2.0 to P2.7 as output
+    LPC_PINCON->PINSEL0 = 0; 
     LPC_GPIO0->FIODIR |= 0x00000FF0;
 
     LPC_SC->PCONP |= (1 << 12);
