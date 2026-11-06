@@ -17,7 +17,7 @@ Author :
     3072 - 4095 : illuminate the 4th display (U11)
     Only one display should be ON at a time.
 
-    CCE-A Question on 06/11/2026 (Question alady present in this REPO 😂)
+    CCE-A Question on 06/11/2026 (Question already present in this REPO 😂)
 */
 
 #include <LPC17xx.h>
